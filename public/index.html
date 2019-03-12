@@ -5,5 +5,18 @@
 <body>
 	<h1>Leaflet Map Example</h1>
 	<div id="mapid"></div>
+
+	<!-- Modal Structure -->
+	<div id="modal1" class="modal bottom-sheet">
+		<div class="modal-content">
+			<h4>Enter Notes</h4>
+			<p>latitude: <span id="lat"></span> longitude: <span id="lng"></span></p>
+            <textarea id="idNote" placeholder="jot a note about this place"></textarea>
+		</div>
+		<div class="modal-footer">
+			<a id="idButton" href="#!" class="modal-close waves-effect waves-green btn">Add Note to Map</a>
+		</div>
+	</div>
+
 	<script src="main.js"></script>
 </body>
