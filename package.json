@@ -4,7 +4,7 @@
   "description": "leaflet map example",
   "main": "public/index.html",
   "scripts": {
-    "start": "parcel public/index.html --no-hmr",
+    "start": "parcel public/index.html --no-hmr --port $PORT",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Rich Hildred",

@@ -1,8 +1,7 @@
 let L = require("leaflet");
 
-window.addEventListener("load", ()=>{
-    console.log("loaded");
-    let mymap = L.map('mapid').setView([51.505, -0.09], 13);
+function showPosition(oPosition) {
+    let mymap = L.map('mapid').setView([oPosition.coords.latitude, oPosition.coords.longitude], 13);
     // Use OpenStreetMap tiles and attribution
     let osmTiles = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     let attribution = '© OpenStreetMap contributors';
@@ -12,5 +11,16 @@ window.addEventListener("load", ()=>{
         maxZoom: 18,
         attribution: attribution
     }).addTo(mymap);
+
+
+}
+
+window.addEventListener("load", () => {
+    console.log("loaded");
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
 
 });
