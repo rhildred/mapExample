@@ -1,10 +1,24 @@
-let L = require("leaflet");
-require('materialize-css');
+import L  from "leaflet";
+import 'materialize-css';
+import config from "./firebase.js";
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 // modal dialogs. There is only 1.
 let aInstances = null;
 // again only 1 map
 let mymap = null;
+
+firebase.initializeApp(config);
+firebase.database().ref('waypoints').on("value", snapshot =>{
+    let oWaypoints = snapshot.val();
+    console.log(oWaypoints);
+    Object.keys(oWaypoints).map((key) => {
+        let oWaypoint = oWaypoints[key];
+        let marker = L.marker([oWaypoint.lat, oWaypoint.lng]).addTo(mymap);
+        marker.bindPopup(oWaypoint.note).openPopup();
+    });
+});
 
 function showPosition(oPosition) {
     mymap = L.map('mapid').setView([oPosition.coords.latitude, oPosition.coords.longitude], 13);
@@ -18,7 +32,7 @@ function showPosition(oPosition) {
         attribution: attribution
     }).addTo(mymap);
 
-    mymap.on("contextmenu", (evt) =>{
+    function onContextMenu(evt){
         // right click ... would need to change this for a phone
         document.getElementById("lat").innerHTML = evt.latlng.lat;
         document.getElementById("lng").innerHTML = evt.latlng.lng;
@@ -28,15 +42,27 @@ function showPosition(oPosition) {
             elClone = el.cloneNode(true);
         el.parentNode.replaceChild(elClone, el);
 
-        elClone.addEventListener("click", (evtClick)=>{
+        elClone.addEventListener("click", ()=>{
             let oNote = document.getElementById("idNote");
+            // insert to firebase
+            let waypointID = new Date().toISOString().replace(".", "_");
             // evt is a closure
-            alert("saving note: " + oNote.value + " latitude: " + evt.latlng.lat + " longitude: " + evt.latlng.lng );
+            firebase.database().ref('waypoints/' + waypointID).set({
+                lat:evt.latlng.lat,
+                lng:evt.latlng.lng,
+                note:oNote.value
+            }).then(() => {
+                console.log("inserted");
+            });
             oNote.value = "";
+    
         });
         aInstances[0].open();
-    });
 
+    }
+
+    mymap.on("contextmenu", onContextMenu);
+        
 
 }
 
