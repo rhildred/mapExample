@@ -1,4 +1,4 @@
-import L  from "leaflet";
+import L from "leaflet";
 import 'materialize-css';
 import config from "./firebase.js";
 import firebase from 'firebase/app';
@@ -10,7 +10,7 @@ let aInstances = null;
 let mymap = null;
 
 firebase.initializeApp(config);
-firebase.database().ref('waypoints').on("value", snapshot =>{
+firebase.database().ref('waypoints').on("value", snapshot => {
     let oWaypoints = snapshot.val();
     console.log(oWaypoints);
     Object.keys(oWaypoints).map((key) => {
@@ -32,8 +32,8 @@ function showPosition(oPosition) {
         attribution: attribution
     }).addTo(mymap);
 
-    function onContextMenu(evt){
-        // right click ... would need to change this for a phone
+    function onContextMenu(evt) {
+        // right click ... this is a long press on a phone
         document.getElementById("lat").innerHTML = evt.latlng.lat;
         document.getElementById("lng").innerHTML = evt.latlng.lng;
 
@@ -42,27 +42,54 @@ function showPosition(oPosition) {
             elClone = el.cloneNode(true);
         el.parentNode.replaceChild(elClone, el);
 
-        elClone.addEventListener("click", ()=>{
+        elClone.addEventListener("click", () => {
             let oNote = document.getElementById("idNote");
             // insert to firebase
             let waypointID = new Date().toISOString().replace(".", "_");
             // evt is a closure
             firebase.database().ref('waypoints/' + waypointID).set({
-                lat:evt.latlng.lat,
-                lng:evt.latlng.lng,
-                note:oNote.value
+                lat: evt.latlng.lat,
+                lng: evt.latlng.lng,
+                note: oNote.value
             }).then(() => {
                 console.log("inserted");
             });
             oNote.value = "";
-    
+
         });
         aInstances[0].open();
 
     }
 
-    mymap.on("contextmenu", onContextMenu);
-        
+    mymap.on("contextmenu", (evt) => {
+        // right click ... this is a long press on a phone
+        document.getElementById("lat").innerHTML = evt.latlng.lat;
+        document.getElementById("lng").innerHTML = evt.latlng.lng;
+
+        // get rid of previous handlers
+        let el = document.getElementById('idButton'),
+            elClone = el.cloneNode(true);
+        el.parentNode.replaceChild(elClone, el);
+
+        elClone.addEventListener("click", () => {
+            let oNote = document.getElementById("idNote");
+            // insert to firebase
+            let waypointID = new Date().toISOString().replace(".", "_");
+            // evt is a closure
+            firebase.database().ref('waypoints/' + waypointID).set({
+                lat: evt.latlng.lat,
+                lng: evt.latlng.lng,
+                note: oNote.value
+            }).then(() => {
+                console.log("inserted");
+            });
+            oNote.value = "";
+
+        });
+        aInstances[0].open();
+
+    });
+
 
 }
 
